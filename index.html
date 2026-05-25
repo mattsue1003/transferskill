@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>長照轉移位技巧 — Transfer Techniques for Long-term Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F2EBDE;
+    --cream-2:#EBE3D2;
+    --ink:#1E1A14;
+    --ink-soft:#3A332A;
+    --muted:#8A7E6A;
+    --line:#C9BFA9;
+    --vermilion:#B33A2A;
+    --vermilion-deep:#8B2C1E;
+    --sage:#5C7146;
+    --gold:#A8843A;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  body{
+    font-family:"Noto Sans TC",sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1000;opacity:.35;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode:multiply;
+  }
+
+  .deck{position:relative;width:100vw;height:100vh}
+  .slide{
+    position:absolute;inset:0;
+    padding:64px 88px 96px;
+    display:flex;flex-direction:column;
+    opacity:0;visibility:hidden;
+    transition:opacity .6s ease, transform .6s ease;
+    transform:translateY(12px);
+    overflow-y:auto;
+  }
+  .slide.active{opacity:1;visibility:visible;transform:translateY(0)}
+
+  .header-strip{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding-bottom:18px;border-bottom:1px solid var(--line);
+    margin-bottom:42px;
+  }
+  .brand{
+    font-family:"Cormorant Garamond",serif;
+    font-style:italic;font-weight:400;font-size:15px;letter-spacing:.04em;
+    color:var(--ink-soft);
+  }
+  .brand b{font-style:normal;font-weight:600;color:var(--vermilion);letter-spacing:.08em;text-transform:uppercase;font-size:12px;margin-right:10px}
+  .chapter-tag{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:14px;color:var(--muted);
+    letter-spacing:.06em;
+  }
+
+  .deck-nav{
+    position:fixed;bottom:24px;left:0;right:0;z-index:50;
+    display:flex;justify-content:center;align-items:center;gap:32px;
+    pointer-events:none;
+  }
+  .deck-nav button{
+    pointer-events:auto;
+    background:transparent;border:1px solid var(--line);
+    width:40px;height:40px;border-radius:50%;
+    cursor:pointer;font-family:"Cormorant Garamond",serif;font-size:18px;color:var(--ink-soft);
+    transition:all .25s ease;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .deck-nav button:hover{background:var(--ink);color:var(--cream);border-color:var(--ink);transform:translateY(-2px)}
+  .counter{
+    pointer-events:auto;
+    font-family:"Cormorant Garamond",serif;font-size:16px;letter-spacing:.12em;
+    color:var(--ink-soft);min-width:80px;text-align:center;
+  }
+  .counter .now{font-weight:600;color:var(--vermilion);font-size:18px}
+
+  .progress{
+    position:fixed;top:0;left:0;height:2px;background:var(--vermilion);
+    z-index:60;transition:width .5s ease;
+  }
+
+  /* ====== SLIDE 1 COVER ====== */
+  .cover{
+    padding:0;justify-content:center;align-items:stretch;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(179,58,42,0.08), transparent 50%),
+      radial-gradient(ellipse at 70% 80%, rgba(92,113,70,0.08), transparent 50%),
+      var(--cream);
+  }
+  .cover-grid{
+    display:grid;grid-template-columns:1fr auto 1.4fr;
+    width:100%;height:100%;
+    align-items:center;
+  }
+  .cover-left{padding:88px;display:flex;flex-direction:column;justify-content:space-between;height:100%}
+  .cover-left-top{display:flex;gap:18px;align-items:center}
+  .vermilion-dot{width:10px;height:10px;background:var(--vermilion);border-radius:50%}
+  .cover-meta{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:14px;
+    letter-spacing:.16em;color:var(--ink-soft);text-transform:uppercase;
+  }
+  .cover-volume{
+    font-family:"Cormorant Garamond",serif;font-size:13px;letter-spacing:.2em;
+    color:var(--muted);text-transform:uppercase;
+  }
+  .cover-divider{width:1px;background:var(--line);height:70%;align-self:center;justify-self:center}
+  .cover-right{padding:88px 88px 88px 64px}
+  .cover-eyebrow{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:18px;
+    color:var(--vermilion);letter-spacing:.08em;margin-bottom:24px;
+  }
+  .cover-title{
+    font-family:"Noto Serif TC",serif;font-weight:900;
+    font-size:clamp(72px, 9vw, 132px);line-height:.95;
+    color:var(--ink);letter-spacing:-.02em;
+    margin-bottom:32px;
+  }
+  .cover-title .accent{color:var(--vermilion);position:relative;display:inline-block}
+  .cover-en{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:400;
+    font-size:28px;color:var(--ink-soft);letter-spacing:.02em;line-height:1.3;
+    margin-bottom:48px;
+    border-left:2px solid var(--vermilion);padding-left:18px;
+  }
+  .cover-tags{display:flex;gap:14px;flex-wrap:wrap}
+  .cover-tag{
+    font-family:"Noto Sans TC",sans-serif;font-size:13px;font-weight:500;
+    padding:8px 16px;border:1px solid var(--line);border-radius:100px;
+    background:rgba(255,255,255,.4);color:var(--ink-soft);letter-spacing:.05em;
+  }
+  .cover-stamp{
+    position:absolute;top:64px;right:88px;
+    width:88px;height:88px;border:2px solid var(--vermilion);
+    border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:rgba(179,58,42,.05);
+    transform:rotate(-8deg);
+  }
+  .cover-stamp .inner{
+    width:74px;height:74px;border:1px solid var(--vermilion);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    color:var(--vermilion);font-family:"Noto Serif TC",serif;font-weight:700;
+    font-size:14px;line-height:1.1;text-align:center;
+  }
+  .cover-stamp .inner small{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:9px;letter-spacing:.1em;margin-top:3px}
+
+  .cover-vertical{
+    writing-mode:vertical-rl;
+    font-family:"Noto Serif TC",serif;font-weight:500;
+    font-size:20px;letter-spacing:.5em;color:var(--ink-soft);
+    align-self:start;margin-top:64px;
+  }
+  .cover-bottom{
+    display:flex;justify-content:space-between;align-items:flex-end;
+  }
+  .cover-bottom-meta{
+    display:flex;gap:32px;
+  }
+  .cover-bottom-meta div{font-family:"Cormorant Garamond",serif;font-size:13px;color:var(--muted);letter-spacing:.08em}
+  .cover-bottom-meta b{display:block;font-family:"Noto Serif TC",serif;font-weight:600;color:var(--ink);font-size:15px;margin-top:4px;letter-spacing:0}
+
+  /* ====== TOC ====== */
+  .toc-layout{display:grid;grid-template-columns:1fr 1.3fr;gap:80px;flex:1;align-items:start}
+  .toc-aside{position:sticky;top:0}
+  .section-eyebrow{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:16px;
+    color:var(--vermilion);letter-spacing:.08em;margin-bottom:16px;
+  }
+  .section-title{
+    font-family:"Noto Serif TC",serif;font-weight:700;font-size:56px;line-height:1.1;
+    color:var(--ink);margin-bottom:24px;letter-spacing:-.01em;
+  }
+  .section-lead{
+    font-size:17px;color:var(--ink-soft);line-height:1.8;max-width:380px;
+  }
+  .toc-list{list-style:none}
+  .toc-list li{
+    display:grid;grid-template-columns:60px 1fr auto;align-items:baseline;
+    padding:20px 0;border-bottom:1px solid var(--line);gap:24px;
+    cursor:pointer;transition:all .25s ease;
+  }
+  .toc-list li:hover{padding-left:12px}
+  .toc-list li:hover .toc-num{color:var(--vermilion)}
+  .toc-num{
+    font-family:"Cormorant Garamond",serif;font-size:30px;color:var(--muted);
+    font-weight:400;transition:color .25s ease;
+  }
+  .toc-name{
+    font-family:"Noto Serif TC",serif;font-weight:600;font-size:22px;color:var(--ink);
+  }
+  .toc-name small{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:400;font-size:13px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+  .toc-page{font-family:"Cormorant Garamond",serif;font-size:14px;color:var(--muted);letter-spacing:.08em}
+  .toc-list li.appendix .toc-num{color:var(--sage)}
+  .toc-list li.appendix:hover .toc-num{color:var(--sage)}
+
+  /* ====== content slide ====== */
+  .content-head{margin-bottom:48px;max-width:900px}
+  .content-eyebrow{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:15px;
+    color:var(--vermilion);letter-spacing:.08em;margin-bottom:14px;
+  }
+  .content-title{
+    font-family:"Noto Serif TC",serif;font-weight:800;font-size:64px;line-height:1.05;
+    color:var(--ink);letter-spacing:-.01em;
+  }
+  .content-title .accent{color:var(--vermilion)}
+  .content-title-en{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:22px;
+    color:var(--muted);margin-top:14px;letter-spacing:.02em;
+  }
+
+  .concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;flex:1;align-items:start}
+  .concept-text p{font-size:17px;line-height:1.85;color:var(--ink-soft);margin-bottom:18px}
+  .concept-text p:first-child::first-letter{
+    font-family:"Noto Serif TC",serif;font-size:64px;font-weight:700;
+    float:left;line-height:1;margin:6px 12px 0 0;color:var(--vermilion);
+  }
+  .concept-text strong{color:var(--ink);font-weight:600}
+
+  .pull-quote{
+    border-left:3px solid var(--vermilion);padding:24px 32px;
+    background:rgba(179,58,42,.04);margin:24px 0;
+    font-family:"Noto Serif TC",serif;font-weight:500;font-size:22px;line-height:1.6;
+    color:var(--ink);
+  }
+  .pull-quote small{display:block;font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;color:var(--muted);margin-top:10px;letter-spacing:.06em}
+
+  .feature-card{
+    background:var(--cream-2);
+    border:1px solid var(--line);
+    padding:36px;
+    position:relative;
+    overflow:hidden;
+  }
+  .feature-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--vermilion);
+  }
+  .feature-card h4{
+    font-family:"Noto Serif TC",serif;font-weight:700;font-size:28px;color:var(--ink);
+    margin-bottom:18px;display:flex;align-items:center;gap:14px;
+  }
+  .feature-card h4 .num{
+    font-family:"Cormorant Garamond",serif;font-style:italic;
+    color:var(--vermilion);font-size:24px;font-weight:500;
+  }
+  .feature-card ul{list-style:none}
+  .feature-card li{
+    padding:10px 0 10px 24px;position:relative;font-size:16px;color:var(--ink-soft);line-height:1.7;
+    border-bottom:1px dashed var(--line);
+  }
+  .feature-card li:last-child{border-bottom:none}
+  .feature-card li::before{
+    content:"";position:absolute;left:0;top:18px;width:10px;height:1px;background:var(--vermilion);
+  }
+  .feature-card li b{color:var(--ink);font-weight:600}
+
+  .alert{
+    background:linear-gradient(135deg, rgba(179,58,42,.08), rgba(168,132,58,.08));
+    border:1px solid var(--vermilion);
+    padding:24px 28px;margin-top:32px;
+    display:flex;gap:20px;align-items:flex-start;
+  }
+  .alert .icon{
+    width:36px;height:36px;border-radius:50%;background:var(--vermilion);color:var(--cream);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    font-family:"Noto Serif TC",serif;font-weight:700;font-size:20px;
+  }
+  .alert h5{font-family:"Noto Serif TC",serif;font-size:18px;color:var(--ink);margin-bottom:6px;font-weight:700}
+  .alert p{font-size:15px;color:var(--ink-soft);line-height:1.7}
+
+  .triple{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;flex:1;align-items:stretch}
+
+  /* video slide (large) */
+  .video-layout{display:grid;grid-template-columns:auto 1fr;gap:64px;flex:1;align-items:start}
+  .video-frame{
+    width:300px;aspect-ratio:9/16;
+    background:#000;border:1px solid var(--ink);
+    position:relative;overflow:hidden;
+    box-shadow:24px 24px 0 -8px var(--vermilion), 24px 24px 0 -7px var(--ink);
+  }
+  .video-frame iframe{width:100%;height:100%;border:none;display:block}
+  .video-info h3{
+    font-family:"Noto Serif TC",serif;font-weight:700;font-size:40px;
+    line-height:1.15;margin-bottom:18px;
+  }
+  .video-info .v-eyebrow{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:15px;color:var(--vermilion);
+    letter-spacing:.1em;margin-bottom:12px;display:flex;align-items:center;gap:12px;
+  }
+  .v-eyebrow::before{content:"";width:32px;height:1px;background:var(--vermilion);display:inline-block}
+  .video-info > p{font-size:17px;color:var(--ink-soft);line-height:1.85;margin-bottom:22px;max-width:520px}
+
+  .key-points{
+    list-style:none;margin-top:16px;padding:24px 28px;
+    background:var(--cream-2);border-left:3px solid var(--sage);
+  }
+  .key-points li{padding:8px 0;font-size:15px;color:var(--ink-soft);display:flex;gap:14px;align-items:flex-start}
+  .key-points li::before{
+    content:counter(kpc, decimal-leading-zero);counter-increment:kpc;
+    font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--sage);font-weight:600;
+    font-size:18px;flex-shrink:0;
+  }
+  .key-points{counter-reset:kpc}
+
+  /* aid slide */
+  .aid-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:60px;flex:1;align-items:start}
+  .aid-visual{
+    aspect-ratio:4/3;background:var(--cream-2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+  }
+  .aid-visual svg{width:80%;height:80%}
+
+  /* recovery cards */
+  .recovery-card{
+    background:var(--cream-2);border:1px solid var(--line);padding:32px;display:flex;flex-direction:column;
+    position:relative;height:100%;
+  }
+  .recovery-card .rc-num{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:18px;
+    color:var(--vermilion);letter-spacing:.1em;margin-bottom:14px;
+  }
+  .recovery-card h4{
+    font-family:"Noto Serif TC",serif;font-weight:700;font-size:30px;color:var(--ink);
+    margin-bottom:18px;line-height:1.2;
+  }
+  .recovery-card p{font-size:15px;color:var(--ink-soft);line-height:1.75;margin-bottom:16px}
+  .recovery-card .tag{
+    display:inline-block;padding:5px 12px;font-size:12px;letter-spacing:.05em;
+    border:1px solid var(--ink-soft);color:var(--ink-soft);margin-top:auto;width:fit-content;
+  }
+
+  /* closing */
+  .closing-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;flex:1;align-items:center}
+  .closing-num{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:22px;color:var(--vermilion);
+    margin-bottom:24px;letter-spacing:.1em;
+  }
+  .closing-title{
+    font-family:"Noto Serif TC",serif;font-weight:900;font-size:88px;line-height:1;color:var(--ink);
+    margin-bottom:32px;letter-spacing:-.02em;
+  }
+  .principles{list-style:none}
+  .principles li{
+    padding:24px 0;border-bottom:1px solid var(--line);
+    display:grid;grid-template-columns:50px 1fr;gap:24px;align-items:baseline;
+  }
+  .principles li:last-child{border-bottom:none}
+  .principles .p-num{
+    font-family:"Cormorant Garamond",serif;font-size:36px;color:var(--vermilion);font-weight:300;
+  }
+  .principles h5{font-family:"Noto Serif TC",serif;font-weight:700;font-size:24px;color:var(--ink);margin-bottom:8px}
+  .principles p{font-size:15px;color:var(--ink-soft);line-height:1.7}
+
+  /* ====== video gallery (appendix) ====== */
+  .gallery-grid{
+    display:grid;grid-template-columns:repeat(2, 1fr);gap:36px 48px;flex:1;align-items:start;
+  }
+  .gallery-item{
+    display:grid;grid-template-columns:140px 1fr;gap:22px;align-items:start;
+    padding-bottom:24px;border-bottom:1px solid var(--line);
+  }
+  .gallery-item:nth-last-child(-n+2){border-bottom:none;padding-bottom:0}
+  .gallery-frame{
+    width:140px;aspect-ratio:9/16;background:#000;
+    border:1px solid var(--ink);overflow:hidden;
+    box-shadow:8px 8px 0 -2px var(--vermilion), 8px 8px 0 -1px var(--ink);
+  }
+  .gallery-frame iframe{width:100%;height:100%;border:none;display:block}
+  .gallery-text .g-num{
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;
+    color:var(--vermilion);letter-spacing:.12em;margin-bottom:6px;
+  }
+  .gallery-text h4{
+    font-family:"Noto Serif TC",serif;font-weight:700;font-size:22px;
+    color:var(--ink);margin-bottom:10px;line-height:1.3;
+  }
+  .gallery-text p{font-size:14px;color:var(--ink-soft);line-height:1.65}
+  .gallery-text .tag{
+    display:inline-block;font-family:"Cormorant Garamond",serif;font-style:italic;
+    font-size:12px;color:var(--sage);letter-spacing:.06em;margin-top:8px;
+  }
+
+  .hint{
+    position:fixed;bottom:22px;left:32px;z-index:50;
+    font-family:"Cormorant Garamond",serif;font-style:italic;font-size:13px;color:var(--muted);
+    letter-spacing:.08em;
+  }
+  .hint kbd{
+    font-family:"Cormorant Garamond",serif;font-style:normal;
+    background:rgba(0,0,0,.05);border:1px solid var(--line);border-radius:3px;
+    padding:1px 6px;font-size:12px;margin:0 2px;
+  }
+
+  @media (max-width: 900px){
+    .slide{padding:32px 28px 80px}
+    .cover-grid{grid-template-columns:1fr;grid-template-rows:auto auto auto}
+    .cover-left,.cover-right{padding:32px}
+    .cover-divider{display:none}
+    .cover-vertical{writing-mode:horizontal-tb;margin-top:0}
+    .cover-title{font-size:54px}
+    .toc-layout,.concept-grid,.video-layout,.aid-layout,.closing-grid,.gallery-grid{grid-template-columns:1fr;gap:32px}
+    .triple{grid-template-columns:1fr}
+    .content-title,.closing-title,.section-title{font-size:40px}
+    .video-frame{width:240px;margin:0 auto}
+    .video-info h3{font-size:28px}
+    .header-strip{margin-bottom:24px}
+    .gallery-item{grid-template-columns:110px 1fr;gap:16px}
+    .gallery-frame{width:110px}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- ========== SLIDE 1 — COVER ========== -->
+  <section class="slide cover active" data-slide="1">
+    <div class="cover-stamp" aria-hidden="true">
+      <div class="inner">零抬舉<small>NO LIFT</small></div>
+    </div>
+
+    <div class="cover-grid">
+
+      <div class="cover-left">
+        <div>
+          <div class="cover-left-top">
+            <span class="vermilion-dot"></span>
+            <span class="cover-meta">Caregiver Training · 2026</span>
+          </div>
+          <div class="cover-volume" style="margin-top:14px">Volume 01 — Transfer Techniques</div>
+        </div>
+
+        <div class="cover-vertical">以技巧 · 取代蠻力</div>
+
+        <div class="cover-bottom-meta">
+          <div>Chapters<b>05</b></div>
+          <div>Videos<b>06</b></div>
+          <div>Format<b>Slide</b></div>
+        </div>
+      </div>
+
+      <div class="cover-divider"></div>
+
+      <div class="cover-right">
+        <div class="cover-eyebrow">— A practical handbook on safe transfers</div>
+        <h1 class="cover-title">長照<br><span class="accent">轉移位</span><br>技巧</h1>
+        <div class="cover-en">Transfer Techniques<br>for Long-term Care</div>
+        <div class="cover-tags">
+          <span class="cover-tag">零抬舉原則</span>
+          <span class="cover-tag">復能照護</span>
+          <span class="cover-tag">徒手技巧</span>
+          <span class="cover-tag">輕量輔具</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 2 — TOC ========== -->
+  <section class="slide" data-slide="2">
+    <div class="header-strip">
+      <div class="brand"><b>長照轉移位</b>Transfer Techniques · Handbook</div>
+      <div class="chapter-tag">Table of Contents</div>
+    </div>
+
+    <div class="toc-layout">
+      <div class="toc-aside">
+        <div class="section-eyebrow">— Contents</div>
+        <h2 class="section-title">目錄</h2>
+        <p class="section-lead">本簡報依序介紹零抬舉的核心觀念、安全要點，以及三大類轉移位技巧。核心示範影片整合於對應章節，其餘變化版本置於最末附錄章節。</p>
+      </div>
+
+      <ol class="toc-list" start="1">
+        <li onclick="go(3)">
+          <span class="toc-num">01</span>
+          <span class="toc-name">什麼是零抬舉<small>The principle of no-lift</small></span>
+          <span class="toc-page">p. 03</span>
+        </li>
+        <li onclick="go(4)">
+          <span class="toc-num">02</span>
+          <span class="toc-name">安全注意事項<small>Safety essentials · hip hinge &amp; brace</small></span>
+          <span class="toc-page">p. 04</span>
+        </li>
+        <li onclick="go(5)">
+          <span class="toc-num">03</span>
+          <span class="toc-name">復能轉移位技巧<small>Active-assisted transfer</small></span>
+          <span class="toc-page">p. 05</span>
+        </li>
+        <li onclick="go(7)">
+          <span class="toc-num">04</span>
+          <span class="toc-name">徒手轉移位技巧<small>Manual transfer techniques</small></span>
+          <span class="toc-page">p. 07</span>
+        </li>
+        <li onclick="go(9)">
+          <span class="toc-num">05</span>
+          <span class="toc-name">輕量輔具 — 一字帶<small>Transfer belt</small></span>
+          <span class="toc-page">p. 09</span>
+        </li>
+        <li class="appendix" onclick="go(11)">
+          <span class="toc-num">+</span>
+          <span class="toc-name">其他參考轉移位影片<small>Appendix · Other reference videos</small></span>
+          <span class="toc-page">p. 11</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 3 — WHAT IS NO LIFT ========== -->
+  <section class="slide" data-slide="3">
+    <div class="header-strip">
+      <div class="brand"><b>Ch. 01</b>什麼是零抬舉</div>
+      <div class="chapter-tag">— The Principle of No-Lift</div>
+    </div>
+
+    <div class="content-head">
+      <div class="content-eyebrow">— Chapter One</div>
+      <h2 class="content-title">什麼是<span class="accent">零抬舉</span>？</h2>
+      <div class="content-title-en">No-Lift Policy — caring without carrying</div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-text">
+        <p>零抬舉是一種照護理念，主張<strong>不直接抬舉</strong>被照顧者的全身重量。透過引導、身體力學、輔具與技巧，讓個案在能力範圍內<strong>盡可能自己出力</strong>，照顧者僅作支撐與導引。</p>
+        <p>這個觀念顛覆了「使勁抱起來」的傳統做法，背後是對<strong>照顧者腰背健康</strong>與<strong>個案功能維持</strong>的雙重保護。</p>
+
+        <div class="pull-quote">
+          「以技巧取代蠻力，以引導取代抬舉。」
+          <small>— 核心理念</small>
+        </div>
+      </div>
+
+      <div>
+        <div class="feature-card">
+          <h4><span class="num">A.</span>三大目的</h4>
+          <ul>
+            <li><b>保護照顧者</b>　預防腰部、肩頸的累積性運動傷害</li>
+            <li><b>維持個案功能</b>　不剝奪個案使用自身肌力的機會</li>
+            <li><b>提升照護品質</b>　降低跌倒風險，建立信任互動</li>
+          </ul>
+        </div>
+
+        <div class="alert" style="margin-top:24px">
+          <span class="icon">!</span>
+          <div>
+            <h5>核心觀念</h5>
+            <p>零抬舉不是「完全不出力」，而是用<strong>正確的姿勢與方向</strong>給予最小且最有效的協助。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 4 — SAFETY ========== -->
+  <section class="slide" data-slide="4">
+    <div class="header-strip">
+      <div class="brand"><b>Ch. 02</b>安全注意事項</div>
+      <div class="chapter-tag">— Safety Essentials</div>
+    </div>
+
+    <div class="content-head">
+      <div class="content-eyebrow">— Chapter Two</div>
+      <h2 class="content-title"><span class="accent">安全</span>注意事項</h2>
+      <div class="content-title-en">Protecting yourself first — hip hinge &amp; back brace</div>
+    </div>
+
+    <div class="triple" style="grid-template-columns:1fr 1fr;gap:32px">
+      <div class="feature-card">
+        <h4><span class="num">A.</span>髖鉸鏈 Hip Hinge</h4>
+        <ul>
+          <li><b>髖部彎曲，背部維持中立</b>　不彎腰、不駝背，力量從髖關節折出</li>
+          <li><b>用大腿，不用腰</b>　主要施力肌群為臀大肌與股四頭肌</li>
+          <li><b>重心放低，雙腳穩定</b>　兩腳與肩同寬或前後站位，膝蓋微彎</li>
+          <li><b>核心收緊</b>　肚臍微內收，保持腹腔壓力</li>
+          <li><b>靠近個案</b>　縮短力臂，越靠近越省力</li>
+        </ul>
+        <div class="alert" style="margin-top:20px">
+          <span class="icon">✓</span>
+          <div>
+            <h5>口訣</h5>
+            <p>「<strong>屁股往後、胸口往前、膝蓋微彎</strong>」—— 把腰桿當尺，髖當合頁。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <h4><span class="num">B.</span>必要穿戴護腰 Back Brace</h4>
+        <ul>
+          <li><b>進行轉位前先穿戴</b>　提供腰椎額外支撐</li>
+          <li><b>束緊度適中</b>　可吸氣但不鬆脫，過緊會壓迫腹部</li>
+          <li><b>位置正確</b>　覆蓋腰椎L1—L5，下緣不卡髖</li>
+          <li><b>預防勝於治療</b>　降低急性扭傷與椎間盤壓迫風險</li>
+          <li><b>不可長時間穿戴</b>　會造成核心肌群萎縮，建議僅於轉位作業時使用</li>
+        </ul>
+        <div class="alert" style="margin-top:20px">
+          <span class="icon">!</span>
+          <div>
+            <h5>提醒</h5>
+            <p>護腰是「輔助」不是「保險」，<strong>姿勢正確才是根本</strong>。穿了護腰仍要遵守髖鉸鏈原則。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 5 — RECOVERY OVERVIEW ========== -->
+  <section class="slide" data-slide="5">
+    <div class="header-strip">
+      <div class="brand"><b>Ch. 03</b>復能轉移位技巧</div>
+      <div class="chapter-tag">— Active-assisted transfer</div>
+    </div>
+
+    <div class="content-head">
+      <div class="content-eyebrow">— Chapter Three · 個案自己出力</div>
+      <h2 class="content-title"><span class="accent">復能</span>轉移位技巧</h2>
+      <div class="content-title-en">Let the care recipient do the work — guide, don't lift</div>
+    </div>
+
+    <p style="font-size:17px;color:var(--ink-soft);max-width:880px;line-height:1.85;margin-bottom:32px">
+      復能轉移強調<strong>個案是主角</strong>，照顧者退居引導者角色。依照個案剩餘能力，分為三種姿勢類型——讓肌力與本體感覺持續被使用，是延緩失能最有效的方式。
+    </p>
+
+    <div class="triple">
+      <div class="recovery-card">
+        <div class="rc-num">— 01</div>
+        <h4>蹲姿轉移位</h4>
+        <p>適用於可短暫支撐站立、但無法完全站直的個案。透過半蹲姿勢，<strong>引導個案利用大腿力量</strong>由椅面起身轉位至目標位。</p>
+        <p>照顧者位於個案前方，雙膝抵住個案膝蓋，雙手托扶肩胛骨或腋下，<strong>用「站起、轉身、坐下」三拍節奏</strong>引導。</p>
+        <span class="tag">SQUAT TRANSFER</span>
+      </div>
+
+      <div class="recovery-card">
+        <div class="rc-num">— 02</div>
+        <h4>站姿轉移位</h4>
+        <p>個案具部分站立能力時使用。先協助個案完全站立並維持平衡，再以<strong>小步伐轉向</strong>移動至新位置。</p>
+        <p>過程中照顧者保持雙手在個案腰側或扶具上，<strong>給予「不出力但隨時可承接」</strong>的安全感。重心隨個案移動，避免拉扯。</p>
+        <span class="tag">STANDING TRANSFER</span>
+      </div>
+
+      <div class="recovery-card">
+        <div class="rc-num">— 03</div>
+        <h4>坐姿轉移位</h4>
+        <p>個案無法站立但軀幹有控制力時，採用<strong>坐著移動</strong>的方式。利用滑板、滑布或臀部小幅度抬起，分段平行移動至目標座面。</p>
+        <p>關鍵是<strong>兩個座面等高且靠近</strong>，照顧者協助支撐軀幹平衡與引導方向，避免拖拉造成皮膚剪力傷害。</p>
+        <span class="tag">SITTING TRANSFER</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 6 — RECOVERY VIDEO ========== -->
+  <section class="slide" data-slide="6">
+    <div class="header-strip">
+      <div class="brand"><b>Ch. 03</b>復能轉移位 — 示範</div>
+      <div class="chapter-tag">— Video demonstration</div>
+    </div>
+
+    <div class="video-layout">
+      <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/IJWAiQm_xZU" title="復能轉移位技巧" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="video-info">
+        <div class="v-eyebrow">DEMO · 復能技巧示範</div>
+        <h3>卡膝蓋 ＋ 扶持肩胛骨</h3>
+        <p>這是復能轉移位中最常用的核心手法。照顧者以<strong>膝蓋頂住個案膝蓋</strong>形成支點，避免個案站起時膝蓋無力前塌；雙手托住肩胛骨而非腋下，<strong>讓個案的軀幹自然前傾</strong>，利用本身重量帶動站立動作。</p>
+
+        <ul class="key-points">
+          <li><b>卡膝蓋</b>　膝對膝形成穩定支點，預防個案站起時跪倒</li>
+          <li><b>托肩胛骨</b>　手掌貼於肩胛下緣，引導重心前移而非上提</li>
+          <li><b>口令同步</b>　「一、二、三，站」讓個案有預期，自主出力</li>
+          <li><b>身體靠近</b>　胸口貼近個案胸口，縮短力臂、共同重心</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 7 — MANUAL INTRO ========== -->
+  <section class="slide" data-slide="7">
+    <div class="header-strip">
+      <div class="brand"><b>Ch. 04</b>徒手轉移位技巧</div>
+      <div class="chapter-tag">— Manual Transfer Techniques</div>
+    </div>
+
+    <div class="content-head">
+      <div class="content-eyebrow">— Chapter Four</div>
+      <h2 class="content-title"><span class="accent">徒手</span>轉移位技巧</h2>
+      <div class="content-title-en">When tools aren't enough — body mechanics in action</div>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-text">
+        <p>當個案無法主動出力，或在沒有輔具的情境下，<strong>徒手技巧</strong>是照顧者必備的能力。重點不在「力氣大」，而在<strong>運用身體力學</strong>找出省力的施力角度。</p>
+        <p>徒手技巧的代表動作是<strong>扛沙包</strong>——讓個案上身搭在照顧者肩膀上，將重量分散到照顧者背部與大腿。延伸出多種變化（跪姿、蹺蹺板、床上移位等），可依場景靈活組合。</p>
+
+        <div class="pull-quote">
+          記住三件事：<br>
+          <strong>低重心、靠近個案、用大肌肉群。</strong>
+          <small>— Body mechanics in transfer</small>
+        </div>
+      </div>
+
+      <div>
+        <div class="feature-card">
+          <h4><span class="num">本章重點</span></h4>
+          <ul>
+            <li><b>核心示範</b>　扛沙包轉位（下一頁）</li>
+            <li><b>延伸變化</b>　跪姿、蹺蹺板、跪姿＋扛沙包、躺床上移（見附錄）</li>
+            <li><b>共通原則</b>　穿護腰、髖鉸鏈、口令同步、事前溝通</li>
+            <li><b>絕對禁忌</b>　不可彎腰直拉、不可單手提舉、不可邊轉邊站</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 8 — MANUAL MAIN DEMO ========== -->
+  <section class="slide" data-slide="8">
+    <div class="header-strip">
+      <div class="brand"><b>Ch. 04</b>徒手轉移位 — 核心示範</div>
+      <div class="chapter-tag">— Shoulder-carry transfer</div>
+    </div>
+
+    <div class="video-layout">
+      <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/_caLyd2ZKhM" title="扛沙包轉位技巧" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="video-info">
+        <div class="v-eyebrow">DEMO · 徒手技巧核心</div>
+        <h3>扛沙包轉位技巧</h3>
+        <p>「扛沙包」是一種比喻——讓個案的上身像一袋米一樣<strong>搭在照顧者的肩膀上</strong>，重心交給照顧者的背部與腿部承擔。這是徒手轉位最基礎也最關鍵的動作，後續變化版本（跪姿、蹺蹺板）皆由此延伸。</p>
+
+        <ul class="key-points">
+          <li><b>抱姿前準備</b>　雙腳前後弓步，髖部下沉，穿戴護腰</li>
+          <li><b>個案重心過肩</b>　胸口貼胸口，上身越過照顧者肩線</li>
+          <li><b>站起再轉</b>　不要邊轉邊站，「先站直、再轉向、再坐下」三步分明</li>
+          <li><b>落地輕柔</b>　下放時用腿緩慢屈曲，膝蓋先彎，臀部自然下沉</li>
+        </ul>
+
+        <div class="alert" style="margin-top:24px">
+          <span class="icon">!</span>
+          <div>
+            <h5>適用前提</h5>
+            <p>個案需有<strong>頭頸支撐能力</strong>、無肩關節脫臼疑慮；照顧者已熟練髖鉸鏈動作，且穿戴護腰。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 9 — TRANSFER BELT ========== -->
+  <section class="slide" data-slide="9">
+    <div class="header-strip">
+      <div class="brand"><b>Ch. 05</b>輕量輔具 — 一字帶</div>
+      <div class="chapter-tag">— Transfer / Gait Belt</div>
+    </div>
+
+    <div class="content-head">
+      <div class="content-eyebrow">— Chapter Five</div>
+      <h2 class="content-title"><span class="accent">一字帶</span>　Transfer Belt</h2>
+      <div class="content-title-en">A simple loop that changes everything</div>
+    </div>
+
+    <div class="aid-layout">
+      <div class="aid-visual">
+        <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#3A332A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="200" cy="70" r="22" fill="#EBE3D2"/>
+            <path d="M 175,95 Q 170,140 175,180 L 175,210" />
+            <path d="M 225,95 Q 230,140 225,180 L 225,210" />
+            <path d="M 175,100 Q 155,140 152,180" />
+            <path d="M 225,100 Q 245,140 248,180" />
+            <path d="M 178,210 L 175,270" />
+            <path d="M 222,210 L 225,270" />
+          </g>
+          <rect x="160" y="155" width="80" height="22" fill="#B33A2A" stroke="#8B2C1E" stroke-width="1.5" rx="2"/>
+          <rect x="195" y="158" width="10" height="16" fill="#A8843A" stroke="#1E1A14" stroke-width="1"/>
+          <line x1="200" y1="158" x2="200" y2="174" stroke="#1E1A14" stroke-width="1"/>
+          <g stroke="#5C7146" stroke-width="2" fill="none" stroke-dasharray="3 3">
+            <path d="M 110 167 L 158 167"/>
+            <path d="M 242 167 L 290 167"/>
+          </g>
+          <text x="80" y="170" font-family="Cormorant Garamond" font-style="italic" font-size="13" fill="#5C7146">grip</text>
+          <text x="295" y="170" font-family="Cormorant Garamond" font-style="italic" font-size="13" fill="#5C7146">grip</text>
+          <text x="200" y="148" font-family="Noto Serif TC" font-size="11" fill="#8B2C1E" text-anchor="middle" font-weight="700">一字帶 · 圍腰</text>
+        </svg>
+      </div>
+
+      <div>
+        <div class="feature-card">
+          <h4><span class="num">使用方法</span></h4>
+          <ul>
+            <li><b>位置</b>　圍在個案<strong>骨盆上緣腰部</strong>，避免太高壓迫肋骨</li>
+            <li><b>束緊度</b>　可<strong>插入兩指</strong>為標準，不鬆脫亦不勒痛</li>
+            <li><b>抓握</b>　手心朝上（反握），從下方握住帶子，發力時較穩</li>
+            <li><b>避開傷口</b>　若腰腹有手術傷口、造口或引流管，<strong>勿使用</strong></li>
+          </ul>
+        </div>
+
+        <div class="alert" style="margin-top:24px">
+          <span class="icon">+</span>
+          <div>
+            <h5>適用情境</h5>
+            <p>站立轉位、輔助行走、上下車過程的支撐點。<strong>用「拉」帶子取代「拽」個案手臂</strong>，避免肩關節傷害。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 10 — CLOSING ========== -->
+  <section class="slide" data-slide="10">
+    <div class="header-strip">
+      <div class="brand"><b>結語</b>Closing Remarks</div>
+      <div class="chapter-tag">— Three principles to remember</div>
+    </div>
+
+    <div class="closing-grid">
+      <div>
+        <div class="closing-num">— Finale</div>
+        <h2 class="closing-title">記住<br><span style="color:var(--vermilion)">三件事</span></h2>
+        <p style="font-size:18px;color:var(--ink-soft);line-height:1.85;max-width:420px">
+          轉移位的技術千變萬化，但回歸到照護現場，永遠不離這三個核心原則。先評估個案能力，再選擇合適的方法。
+        </p>
+        <div class="cover-tags" style="margin-top:32px">
+          <span class="cover-tag">保護自己</span>
+          <span class="cover-tag">復能優先</span>
+          <span class="cover-tag">適當輔具</span>
+        </div>
+      </div>
+
+      <ol class="principles">
+        <li>
+          <span class="p-num">01</span>
+          <div>
+            <h5>先保護自己</h5>
+            <p>髖鉸鏈、護腰、低重心。照顧者倒下，個案也失去依靠。</p>
+          </div>
+        </li>
+        <li>
+          <span class="p-num">02</span>
+          <div>
+            <h5>復能優先</h5>
+            <p>能讓個案自己出力的部分，絕不代勞。每一次移動都是復健。</p>
+          </div>
+        </li>
+        <li>
+          <span class="p-num">03</span>
+          <div>
+            <h5>善用輔具</h5>
+            <p>一字帶、滑布、滑板——適當的工具，比再大的力氣都有效。</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ========== SLIDE 11 — APPENDIX VIDEO GALLERY ========== -->
+  <section class="slide" data-slide="11">
+    <div class="header-strip">
+      <div class="brand"><b>附錄 Appendix</b>其他參考轉移位影片</div>
+      <div class="chapter-tag">— Other reference videos</div>
+    </div>
+
+    <div class="content-head" style="margin-bottom:36px">
+      <div class="content-eyebrow">— Appendix · 變化版本與情境延伸</div>
+      <h2 class="content-title" style="font-size:48px"><span class="accent">其他參考</span>轉移位影片</h2>
+      <div class="content-title-en" style="font-size:18px">Variations &amp; situational extensions — click each frame to play</div>
+    </div>
+
+    <div class="gallery-grid">
+
+      <div class="gallery-item">
+        <div class="gallery-frame">
+          <iframe src="https://www.youtube.com/embed/ciBbQ-5g2o8" title="跪姿轉移位" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="gallery-text">
+          <div class="g-num">— 01</div>
+          <h4>跪姿轉移位</h4>
+          <p>床面或椅面較低時，照顧者單膝跪地將身體降到與個案同高，保護腰部、形成穩定的三點支撐。</p>
+          <span class="tag">low-position · kneel</span>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-frame">
+          <iframe src="https://www.youtube.com/embed/YjKfc8M8M44" title="蹺蹺板加扛沙包" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="gallery-text">
+          <div class="g-num">— 02</div>
+          <h4>蹺蹺板 ＋ 扛沙包<br><span style="font-weight:400;color:var(--muted);font-size:15px">頭往前　臀往上</span></h4>
+          <p>利用蹺蹺板原理——頭部前傾，臀部自然抬起。配合扛沙包姿勢，能用最小力量完成站立轉位。</p>
+          <span class="tag">seesaw principle</span>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-frame">
+          <iframe src="https://www.youtube.com/embed/B-YzT9L-3F4" title="跪姿加扛沙包" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="gallery-text">
+          <div class="g-num">— 03</div>
+          <h4>跪姿 ＋ 扛沙包</h4>
+          <p>結合跪姿低重心與扛沙包省力原理。適用於從地板、矮床、馬桶等很低位置轉移到較高位置的情境。</p>
+          <span class="tag">combo · floor-to-chair</span>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <div class="gallery-frame">
+          <iframe src="https://www.youtube.com/embed/KVbAJkeFjaY" title="躺床往上移動" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="gallery-text">
+          <div class="g-num">— 04</div>
+          <h4>躺床往上移動</h4>
+          <p>個案因重力滑向床尾時的位置調整。床頭調平、個案屈膝助力、短距離分段移動，避免皮膚剪力傷害。</p>
+          <span class="tag">in-bed repositioning</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<div class="hint">使用 <kbd>←</kbd> <kbd>→</kbd> 切換頁面</div>
+
+<div class="deck-nav">
+  <button class="prev" onclick="prev()" aria-label="上一頁">‹</button>
+  <span class="counter"><span class="now" id="now">01</span> / <span id="total">11</span></span>
+  <button class="next" onclick="next()" aria-label="下一頁">›</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let idx = 0;
+  const nowEl = document.getElementById('now');
+  const totalEl = document.getElementById('total');
+  const progress = document.getElementById('progress');
+  totalEl.textContent = String(total).padStart(2,'0');
+
+  function update(){
+    slides.forEach((s,i)=> s.classList.toggle('active', i===idx));
+    nowEl.textContent = String(idx+1).padStart(2,'0');
+    progress.style.width = ((idx+1)/total*100)+'%';
+    slides[idx].scrollTop = 0;
+  }
+  function next(){ if(idx<total-1){ idx++; update(); } }
+  function prev(){ if(idx>0){ idx--; update(); } }
+  function go(n){ idx = Math.max(0, Math.min(total-1, n-1)); update(); }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight' || e.key===' ' || e.key==='PageDown') { e.preventDefault(); next(); }
+    if(e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); prev(); }
+    if(e.key==='Home'){ idx=0; update(); }
+    if(e.key==='End'){ idx=total-1; update(); }
+  });
+
+  update();
+</script>
+
+</body>
+</html>
